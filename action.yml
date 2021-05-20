@@ -21,6 +21,10 @@ inputs:
     required: false
     description: "exec `size-limit` with the option `windowsVerbatimArguments`"
     default: true
+  package_manager:
+    required: false
+    description: 'a custom package manager'
+    default: 'npm'
 runs:
   using: 'node12'
   main: 'dist/index.js'
