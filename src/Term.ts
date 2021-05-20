@@ -25,19 +25,19 @@ class Term {
     }
 
     if (skipStep !== INSTALL_STEP && skipStep !== BUILD_STEP) {
-      await exec(`${packageManager} install`, [], {
+      await exec(`pnpm install`, [], {
         cwd: directory
       });
     }
 
     if (skipStep !== BUILD_STEP) {
       const script = buildScript || "build";
-      await exec(`${packageManager} run ${script}`, [], {
+      await exec(`pnpm run ${script}`, [], {
         cwd: directory
       });
     }
 
-    const status = await exec("npx size-limit --json", [], {
+    const status = await exec("pnpx size-limit --json", [], {
       windowsVerbatimArguments,
       ignoreReturnCode: true,
       listeners: {

@@ -10578,17 +10578,17 @@ class Term {
                 yield exec_1.exec(`git checkout -f ${branch}`);
             }
             if (skipStep !== INSTALL_STEP && skipStep !== BUILD_STEP) {
-                yield exec_1.exec(`${packageManager} install`, [], {
+                yield exec_1.exec(`pnpm install`, [], {
                     cwd: directory
                 });
             }
             if (skipStep !== BUILD_STEP) {
                 const script = buildScript || "build";
-                yield exec_1.exec(`${packageManager} run ${script}`, [], {
+                yield exec_1.exec(`pnpm run ${script}`, [], {
                     cwd: directory
                 });
             }
-            const status = yield exec_1.exec("npx size-limit --json", [], {
+            const status = yield exec_1.exec("pnpx size-limit --json", [], {
                 windowsVerbatimArguments,
                 ignoreReturnCode: true,
                 listeners: {
