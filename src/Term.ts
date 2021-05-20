@@ -1,5 +1,4 @@
 import { exec } from "@actions/exec";
-import hasYarn from "has-yarn";
 
 const INSTALL_STEP = "install";
 const BUILD_STEP = "build";
@@ -10,9 +9,9 @@ class Term {
     skipStep?: string,
     buildScript?: string,
     windowsVerbatimArguments?: boolean,
-    directory?: string
+    directory?: string,
+    packageManager?: string,
   ): Promise<{ status: number; output: string }> {
-    const manager = hasYarn() ? "yarn" : "npm";
     let output = "";
 
     if (branch) {
@@ -26,14 +25,14 @@ class Term {
     }
 
     if (skipStep !== INSTALL_STEP && skipStep !== BUILD_STEP) {
-      await exec(`${manager} install`, [], {
+      await exec(`${packageManager} install`, [], {
         cwd: directory
       });
     }
 
     if (skipStep !== BUILD_STEP) {
       const script = buildScript || "build";
-      await exec(`${manager} run ${script}`, [], {
+      await exec(`${packageManager} run ${script}`, [], {
         cwd: directory
       });
     }
