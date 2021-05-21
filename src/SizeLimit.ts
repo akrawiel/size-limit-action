@@ -18,10 +18,9 @@ const EmptyResult = {
 };
 
 class SizeLimit {
-  static SIZE_RESULTS_HEADER = ["Path", "Size"];
+  static SIZE_RESULTS_HEADER = ["Size"];
 
   static TIME_RESULTS_HEADER = [
-    "Path",
     "Size",
     "Loading time (3g)",
     "Running time (snapdragon)",
@@ -64,13 +63,8 @@ class SizeLimit {
     return `${value} (${change})`;
   }
 
-  private formatSizeResult(
-    name: string,
-    base: IResult,
-    current: IResult
-  ): Array<string> {
+  private formatSizeResult(base: IResult, current: IResult): Array<string> {
     return [
-      name,
       this.formatLine(
         this.formatBytes(current.size),
         this.formatChange(base.size, current.size)
@@ -78,13 +72,8 @@ class SizeLimit {
     ];
   }
 
-  private formatTimeResult(
-    name: string,
-    base: IResult,
-    current: IResult
-  ): Array<string> {
+  private formatTimeResult(base: IResult, current: IResult): Array<string> {
     return [
-      name,
       this.formatLine(
         this.formatBytes(current.size),
         this.formatChange(base.size, current.size)
@@ -150,9 +139,9 @@ class SizeLimit {
       const currentResult = current[name] || EmptyResult;
 
       if (isSize) {
-        return this.formatSizeResult(name, baseResult, currentResult);
+        return this.formatSizeResult(baseResult, currentResult);
       }
-      return this.formatTimeResult(name, baseResult, currentResult);
+      return this.formatTimeResult(baseResult, currentResult);
     });
 
     return [header, ...fields];
