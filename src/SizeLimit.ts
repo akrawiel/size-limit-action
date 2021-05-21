@@ -7,6 +7,7 @@ interface IResult {
   running?: number;
   loading?: number;
   total?: number;
+  passed: boolean;
 }
 
 const EmptyResult = {
@@ -14,18 +15,20 @@ const EmptyResult = {
   size: 0,
   running: 0,
   loading: 0,
-  total: 0
+  total: 0,
+  passed: true
 };
 
 class SizeLimit {
-  static SIZE_RESULTS_HEADER = ["Path", "Size"];
+  static SIZE_RESULTS_HEADER = ["Path", "Size", "Passed"];
 
   static TIME_RESULTS_HEADER = [
     "Path",
     "Size",
     "Loading time (3g)",
     "Running time (snapdragon)",
-    "Total time"
+    "Total time",
+    "Passed"
   ];
 
   private formatBytes(size: number): string {
@@ -74,7 +77,8 @@ class SizeLimit {
       this.formatLine(
         this.formatBytes(current.size),
         this.formatChange(base.size, current.size)
-      )
+      ),
+      current.passed ? "☑" : "❎"
     ];
   }
 
@@ -97,7 +101,8 @@ class SizeLimit {
         this.formatTime(current.running),
         this.formatChange(base.running, current.running)
       ),
-      this.formatTime(current.total)
+      this.formatTime(current.total),
+      current.passed ? "☑" : "❎"
     ];
   }
 
@@ -124,6 +129,7 @@ class SizeLimit {
           [result.name]: {
             name: result.name,
             size: +result.size,
+            passed: result.passed,
             ...time
           }
         };
