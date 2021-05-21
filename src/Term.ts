@@ -11,6 +11,7 @@ class Term {
     windowsVerbatimArguments?: boolean,
     directory?: string,
     packageManager?: string,
+    packageManagerRunner?: string
   ): Promise<{ status: number; output: string }> {
     let output = "";
 
@@ -25,19 +26,19 @@ class Term {
     }
 
     if (skipStep !== INSTALL_STEP && skipStep !== BUILD_STEP) {
-      await exec(`pnpm install`, [], {
+      await exec(`${packageManager} install`, [], {
         cwd: directory
       });
     }
 
     if (skipStep !== BUILD_STEP) {
       const script = buildScript || "build";
-      await exec(`pnpm run ${script}`, [], {
+      await exec(`${packageManager} run ${script}`, [], {
         cwd: directory
       });
     }
 
-    const status = await exec("pnpx size-limit --json", [], {
+    const status = await exec(`${packageManagerRunner} size-limit --json`, [], {
       windowsVerbatimArguments,
       ignoreReturnCode: true,
       listeners: {
