@@ -9381,13 +9381,15 @@ class SizeLimit {
     formatLine(value, change) {
         return `${value} (${change})`;
     }
-    formatSizeResult(base, current) {
+    formatSizeResult(name, base, current) {
         return [
+            name,
             this.formatLine(this.formatBytes(current.size), this.formatChange(base.size, current.size))
         ];
     }
-    formatTimeResult(base, current) {
+    formatTimeResult(name, base, current) {
         return [
+            name,
             this.formatLine(this.formatBytes(current.size), this.formatChange(base.size, current.size)),
             this.formatLine(this.formatTime(current.loading), this.formatChange(base.loading, current.loading)),
             this.formatLine(this.formatTime(current.running), this.formatChange(base.running, current.running)),
@@ -9422,15 +9424,16 @@ class SizeLimit {
             const baseResult = (base === null || base === void 0 ? void 0 : base[name]) || EmptyResult;
             const currentResult = current[name] || EmptyResult;
             if (isSize) {
-                return this.formatSizeResult(baseResult, currentResult);
+                return this.formatSizeResult(name, baseResult, currentResult);
             }
-            return this.formatTimeResult(baseResult, currentResult);
+            return this.formatTimeResult(name, baseResult, currentResult);
         });
         return [header, ...fields];
     }
 }
-SizeLimit.SIZE_RESULTS_HEADER = ["Size"];
+SizeLimit.SIZE_RESULTS_HEADER = ["Path", "Size"];
 SizeLimit.TIME_RESULTS_HEADER = [
+    "Path",
     "Size",
     "Loading time (3g)",
     "Running time (snapdragon)",
