@@ -29,6 +29,10 @@ inputs:
     required: false
     description: 'a custom package manager runner'
     default: 'npx'
+  fail_upon_limit_exceeding:
+    required: false
+    description: 'flag for action failure on size limit exceeding, true by default'
+    default: true
 runs:
   using: 'node12'
   main: 'dist/index.js'

@@ -47,6 +47,8 @@ async function run() {
     const packageManagerRunner = getInput("package_manager_runner");
     const windowsVerbatimArguments =
       getInput("windows_verbatim_arguments") === "true" ? true : false;
+    const failUponLimitExceeding =
+      getInput("fail_upon_limit_exceeding") === "true" ? true : false;
     const octokit = new GitHub(token);
     const term = new Term();
     const limit = new SizeLimit();
@@ -129,7 +131,7 @@ async function run() {
       }
     }
 
-    if (status > 0) {
+    if (status > 0 && failUponLimitExceeding) {
       setFailed("Size limit has been exceeded.");
     }
   } catch (error) {
