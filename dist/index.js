@@ -2099,6 +2099,7 @@ function run() {
             const packageManager = core_1.getInput("package_manager");
             const packageManagerRunner = core_1.getInput("package_manager_runner");
             const windowsVerbatimArguments = core_1.getInput("windows_verbatim_arguments") === "true" ? true : false;
+            const failUponLimitExceeding = core_1.getInput("fail_upon_limit_exceeding") === "true" ? true : false;
             const octokit = new github_1.GitHub(token);
             const term = new Term_1.default();
             const limit = new SizeLimit_1.default();
@@ -2147,7 +2148,7 @@ function run() {
                     console.log("Error updating comment. This can happen for PR's originating from a fork without write permissions.");
                 }
             }
-            if (status > 0) {
+            if (status > 0 && failUponLimitExceeding) {
                 core_1.setFailed("Size limit has been exceeded.");
             }
         }
@@ -9380,15 +9381,13 @@ class SizeLimit {
     formatLine(value, change) {
         return `${value} (${change})`;
     }
-    formatSizeResult(name, base, current) {
+    formatSizeResult(base, current) {
         return [
-            name,
             this.formatLine(this.formatBytes(current.size), this.formatChange(base.size, current.size))
         ];
     }
-    formatTimeResult(name, base, current) {
+    formatTimeResult(base, current) {
         return [
-            name,
             this.formatLine(this.formatBytes(current.size), this.formatChange(base.size, current.size)),
             this.formatLine(this.formatTime(current.loading), this.formatChange(base.loading, current.loading)),
             this.formatLine(this.formatTime(current.running), this.formatChange(base.running, current.running)),
@@ -9423,16 +9422,15 @@ class SizeLimit {
             const baseResult = (base === null || base === void 0 ? void 0 : base[name]) || EmptyResult;
             const currentResult = current[name] || EmptyResult;
             if (isSize) {
-                return this.formatSizeResult(name, baseResult, currentResult);
+                return this.formatSizeResult(baseResult, currentResult);
             }
-            return this.formatTimeResult(name, baseResult, currentResult);
+            return this.formatTimeResult(baseResult, currentResult);
         });
         return [header, ...fields];
     }
 }
-SizeLimit.SIZE_RESULTS_HEADER = ["Path", "Size"];
+SizeLimit.SIZE_RESULTS_HEADER = ["Size"];
 SizeLimit.TIME_RESULTS_HEADER = [
-    "Path",
     "Size",
     "Loading time (3g)",
     "Running time (snapdragon)",
