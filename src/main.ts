@@ -60,21 +60,32 @@ async function run() {
       packageManager,
       packageManagerRunner
     );
-    const { output: baseOutput } = await term.execSizeLimit(
-      pr.base.ref,
-      null,
-      buildScript,
-      windowsVerbatimArguments,
-      directory,
-      packageManager,
-      packageManagerRunner
-    );
+
+    let baseOutput: string | undefined;
+
+    try {
+      ({ output: baseOutput } = await term.execSizeLimit(
+        pr.base.ref,
+        null,
+        buildScript,
+        windowsVerbatimArguments,
+        directory,
+        packageManager,
+        packageManagerRunner
+      ));
+    } catch {
+      console.log(
+        "Failed to create report from base PR, assuming this run to be the first one"
+      );
+    }
 
     let base;
     let current;
 
     try {
-      base = limit.parseResults(baseOutput);
+      if (baseOutput) {
+        base = limit.parseResults(baseOutput);
+      }
       current = limit.parseResults(output);
     } catch (error) {
       console.log(
