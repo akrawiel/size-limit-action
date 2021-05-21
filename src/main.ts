@@ -60,7 +60,7 @@ async function run() {
     );
     const { output: baseOutput } = await term.execSizeLimit(
       pr.base.ref,
-      skipStep,
+      null,
       buildScript,
       windowsVerbatimArguments,
       directory,
