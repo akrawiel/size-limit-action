@@ -44,6 +44,7 @@ async function run() {
     const buildScript = getInput("build_script");
     const directory = getInput("directory") || process.cwd();
     const packageManager = getInput("package_manager");
+    const packageManagerRunner = getInput("package_manager_runner");
     const windowsVerbatimArguments =
       getInput("windows_verbatim_arguments") === "true" ? true : false;
     const octokit = new GitHub(token);
@@ -56,7 +57,8 @@ async function run() {
       buildScript,
       windowsVerbatimArguments,
       directory,
-      packageManager
+      packageManager,
+      packageManagerRunner
     );
     const { output: baseOutput } = await term.execSizeLimit(
       pr.base.ref,
@@ -64,7 +66,8 @@ async function run() {
       buildScript,
       windowsVerbatimArguments,
       directory,
-      packageManager
+      packageManager,
+      packageManagerRunner
     );
 
     let base;

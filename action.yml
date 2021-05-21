@@ -25,6 +25,10 @@ inputs:
     required: false
     description: 'a custom package manager'
     default: 'npm'
+  package_manager_runner:
+    required: false
+    description: 'a custom package manager runner'
+    default: 'npx'
 runs:
   using: 'node12'
   main: 'dist/index.js'
