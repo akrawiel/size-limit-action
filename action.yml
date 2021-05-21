@@ -33,6 +33,10 @@ inputs:
     required: false
     description: 'flag for action failure on size limit exceeding, true by default'
     default: true
+  heading_suffix:
+    required: false
+    description: 'string to append to heading'
+    default: ''
 runs:
   using: 'node12'
   main: 'dist/index.js'

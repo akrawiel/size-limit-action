@@ -10,7 +10,8 @@ const SIZE_LIMIT_HEADING = `## size-limit report 📦 `;
 async function fetchPreviousComment(
   octokit: GitHub,
   repo: { owner: string; repo: string },
-  pr: { number: number }
+  pr: { number: number },
+  headingSuffix: string
 ) {
   // TODO: replace with octokit.issues.listComments when upgraded to v17
   const commentList = await octokit.paginate(
@@ -23,7 +24,7 @@ async function fetchPreviousComment(
   );
 
   const sizeLimitComment = commentList.find(comment =>
-    comment.body.startsWith(SIZE_LIMIT_HEADING)
+    comment.body.startsWith(`${SIZE_LIMIT_HEADING} ${headingSuffix}`.trim())
   );
   return !sizeLimitComment ? null : sizeLimitComment;
 }
@@ -49,6 +50,7 @@ async function run() {
       getInput("windows_verbatim_arguments") === "true" ? true : false;
     const failUponLimitExceeding =
       getInput("fail_upon_limit_exceeding") === "true" ? true : false;
+    const headingSuffix = getInput("heading_suffix");
     const octokit = new GitHub(token);
     const term = new Term();
     const limit = new SizeLimit();
@@ -97,11 +99,16 @@ async function run() {
     }
 
     const body = [
-      SIZE_LIMIT_HEADING,
+      `${SIZE_LIMIT_HEADING} ${headingSuffix}`.trim(),
       table(limit.formatResults(base, current))
     ].join("\r\n");
 
-    const sizeLimitComment = await fetchPreviousComment(octokit, repo, pr);
+    const sizeLimitComment = await fetchPreviousComment(
+      octokit,
+      repo,
+      pr,
+      headingSuffix
+    );
 
     if (!sizeLimitComment) {
       try {
