@@ -43,7 +43,7 @@ async function run() {
     const skipStep = getInput("skip_step");
     const buildScript = getInput("build_script");
     const directory = getInput("directory") || process.cwd();
-    const packageManager = getInput("package_manager") || "npm";
+    const packageManager = getInput("package_manager");
     const windowsVerbatimArguments =
       getInput("windows_verbatim_arguments") === "true" ? true : false;
     const octokit = new GitHub(token);
