@@ -2096,17 +2096,26 @@ function run() {
             const skipStep = core_1.getInput("skip_step");
             const buildScript = core_1.getInput("build_script");
             const directory = core_1.getInput("directory") || process.cwd();
-            const packageManager = core_1.getInput("package_manager") || "npm";
+            const packageManager = core_1.getInput("package_manager");
+            const packageManagerRunner = core_1.getInput("package_manager_runner");
             const windowsVerbatimArguments = core_1.getInput("windows_verbatim_arguments") === "true" ? true : false;
             const octokit = new github_1.GitHub(token);
             const term = new Term_1.default();
             const limit = new SizeLimit_1.default();
-            const { status, output } = yield term.execSizeLimit(null, skipStep, buildScript, windowsVerbatimArguments, directory, packageManager);
-            const { output: baseOutput } = yield term.execSizeLimit(pr.base.ref, skipStep, buildScript, windowsVerbatimArguments, directory, packageManager);
+            const { status, output } = yield term.execSizeLimit(null, skipStep, buildScript, windowsVerbatimArguments, directory, packageManager, packageManagerRunner);
+            let baseOutput;
+            try {
+                ({ output: baseOutput } = yield term.execSizeLimit(pr.base.ref, null, buildScript, windowsVerbatimArguments, directory, packageManager, packageManagerRunner));
+            }
+            catch (_a) {
+                console.log("Failed to create report from base PR, assuming this run to be the first one");
+            }
             let base;
             let current;
             try {
-                base = limit.parseResults(baseOutput);
+                if (baseOutput) {
+                    base = limit.parseResults(baseOutput);
+                }
                 current = limit.parseResults(output);
             }
             catch (error) {
@@ -9403,13 +9412,15 @@ class SizeLimit {
         }, {});
     }
     formatResults(base, current) {
-        const names = [...new Set([...Object.keys(base), ...Object.keys(current)])];
+        const names = [
+            ...new Set([...Object.keys(base || {}), ...Object.keys(current)])
+        ];
         const isSize = names.some((name) => current[name] && current[name].total === undefined);
         const header = isSize
             ? SizeLimit.SIZE_RESULTS_HEADER
             : SizeLimit.TIME_RESULTS_HEADER;
         const fields = names.map((name) => {
-            const baseResult = base[name] || EmptyResult;
+            const baseResult = (base === null || base === void 0 ? void 0 : base[name]) || EmptyResult;
             const currentResult = current[name] || EmptyResult;
             if (isSize) {
                 return this.formatSizeResult(name, baseResult, currentResult);
@@ -10565,7 +10576,7 @@ const exec_1 = __webpack_require__(986);
 const INSTALL_STEP = "install";
 const BUILD_STEP = "build";
 class Term {
-    execSizeLimit(branch, skipStep, buildScript, windowsVerbatimArguments, directory, packageManager) {
+    execSizeLimit(branch, skipStep, buildScript, windowsVerbatimArguments, directory, packageManager, packageManagerRunner) {
         return __awaiter(this, void 0, void 0, function* () {
             let output = "";
             if (branch) {
@@ -10578,17 +10589,17 @@ class Term {
                 yield exec_1.exec(`git checkout -f ${branch}`);
             }
             if (skipStep !== INSTALL_STEP && skipStep !== BUILD_STEP) {
-                yield exec_1.exec(`pnpm install`, [], {
+                yield exec_1.exec(`${packageManager} install`, [], {
                     cwd: directory
                 });
             }
             if (skipStep !== BUILD_STEP) {
                 const script = buildScript || "build";
-                yield exec_1.exec(`pnpm run ${script}`, [], {
+                yield exec_1.exec(`${packageManager} run ${script}`, [], {
                     cwd: directory
                 });
             }
-            const status = yield exec_1.exec("pnpx size-limit --json", [], {
+            const status = yield exec_1.exec(`${packageManagerRunner} size-limit --json`, [], {
                 windowsVerbatimArguments,
                 ignoreReturnCode: true,
                 listeners: {
